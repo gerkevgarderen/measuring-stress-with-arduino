@@ -15,18 +15,15 @@
 #include <FHT.h> // include the library for Fourier transform
 
 #define vibrationPin 5
-boolean vibing = true; //checks whether vibration is currently on
-boolean silence = false;
-long vibeTimeSet = 500;
-long vibeTimer = 0;
+boolean vibing = false; //checks whether vibration is currently on
+volatile unsigned long vibeTime = 0;
 
 float HF=0;
 float LF=0;
-float LFHF,LFHFOld;
 
 
 //  Variables
-//int sensorVcc = 12;
+int sensorVcc = 12;
 int pulsePin = A0;                 // Pulse Sensor purple wire connected to analog pin 0
 int blinkPin = 13;                // pin to blink led at each beat
 
@@ -42,8 +39,8 @@ int dataCount = 0;
 boolean once = false;
 
 void setup(){
- // pinMode(sensorVcc,OUTPUT);
- // digitalWrite(sensorVcc,HIGH);
+  pinMode(sensorVcc,OUTPUT);
+  digitalWrite(sensorVcc,HIGH);
   
   pinMode(blinkPin,OUTPUT);         // pin that will blink to your heartbeat!
 
@@ -64,7 +61,7 @@ void loop(){
         Fourier();                      // Run the Fourier code to calculate HF/LF    
         QS = false;                     // reset the Quantified Self flag for next time    
   }
-  delay(10);                             //  take a break
+  //delay(20);                             //  take a break
 }
 
 
