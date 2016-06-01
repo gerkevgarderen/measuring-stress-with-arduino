@@ -29,12 +29,25 @@ ISR(TIMER2_COMPA_vect){                         // triggered when Timer2 counts 
   Signal = analogRead(pulsePin);              // read the Pulse Sensor 
   sampleCounter += 2;                         // keep track of the time in mS with this variable
   int N = sampleCounter - lastBeatTime;       // monitor the time since the last beat to avoid noise
-
-  vibeTime -= 2; 
-  if (vibing && vibeTime < 0){
+ 
+  vibeTimer = max(0,vibeTimer-2);
+  //Serial.println(vibeTimer);
+  //Serial.println(vibeTimeSet);
+ // Serial.println(vibeTime1);
+  
+  if (vibing && vibeTimer == 0){
     vibing = false;
+    silence = true;
     analogWrite(vibrationPin,0);
-  }
+    vibeTimer = vibeTimeSet;
+  } else if (silence && vibeTimer == 0){
+    silence = false;
+    
+  } else if (!silence && !vibing ){
+    vibing = true;
+    vibeTimer = 200;
+    analogWrite(vibrationPin,150);
+  } 
   
     //  find the peak and trough of the pulse wave
   if(Signal < thresh && N > (IBI/5)*3){       // avoid dichrotic noise by waiting 3/5 of last IBI

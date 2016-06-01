@@ -15,7 +15,7 @@ void Fourier(){
      // Serial.println(fht_input[i]); // put real data into bins
     // }
 
-    Serial.println("Calculating..");
+    //Serial.println("Calculating..");
     noInterrupts();
     fht_window(); // window the data for better frequency response
     fht_reorder(); // reorder the data before doing the fht
@@ -32,12 +32,12 @@ void Fourier(){
     }
     LF=LF/3;
     HF=HF/6;
+    LFHF=LF/HF;
     //Serial.println(LF);
     //Serial.println(HF);
-    Serial.println(LF/HF);
+    //Serial.println(LFHF);
 
-    vibing = true;
-    vibeTime = (50*(LF/HF));
-    analogWrite(vibrationPin,255);
+    vibeTimeSet = 500*((LFHFOld + (LFHF))/2);
+    LFHFOld = LFHF;
   }
 }
