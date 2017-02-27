@@ -1,21 +1,23 @@
 void Fourier(){ 
+ 
+ // Check if we have enough data for Fourier transform (lower than 31 means not enough) 
+ // if not enough, add current reading to the array
  if (dataCount < 31){
     dataCount++;
     data[dataCount] = IBI;
   }
+ // If enough data is gathered, continue with calculation
   else{        
-    for (int i = 0 ; i < FHT_N-1 ; i++) { // save 256 samples
-      data[i] = data[i+1];
-    }
-    data[31]=IBI;
-    for (int i = 0 ; i < FHT_N ; i++) { // save 256 samples
+  	for (int i = 0 ; i < FHT_N-1 ; i++) { // save 256 samples
+  		data[i] = data[i+1];
+  	}
+			// add current reading to the list
+   data[31]=IBI;
+    
+   for (int i = 0 ; i < FHT_N ; i++) { // save 256 samples
       fht_input[i] = data[i]; // put real data into bins
     }
-    //for (int i = 0 ; i < FHT_N ; i++) { // save 256 samples
-     // Serial.println(fht_input[i]); // put real data into bins
-    // }
-
-    //Serial.println("Calculating..");
+    
     noInterrupts();
     fht_window(); // window the data for better frequency response
     fht_reorder(); // reorder the data before doing the fht
