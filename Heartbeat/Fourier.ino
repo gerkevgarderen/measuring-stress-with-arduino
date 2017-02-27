@@ -1,3 +1,5 @@
+/** This function contains all the code required to calculate the stress levels from the readings. */
+
 void Fourier(){ 
  
  // Check if we have enough data for Fourier transform (lower than 31 means not enough) 
