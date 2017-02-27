@@ -6,10 +6,12 @@ The Arduino then does a Fast Hartley Transform (FFH, alternative for Fourier) tr
 Based on these values, a relatively accurate indication of the stress levels can be found.
 
 Background on FFH:
-	Piccinin, F., & Department of Defence, South Australia. (1967). THE FAST HARTLEY TRANSFORM AS AN ALTERNATIVE TO THE FAST FOURIER TRANSFORM (Technical Memorandum). Retrieved from http://www.dtic.mil/dtic/tr/fulltext/u2/a212493.pdf
+
+>Piccinin, F., & Department of Defence, South Australia. (1967). THE FAST HARTLEY TRANSFORM AS AN ALTERNATIVE TO THE FAST FOURIER TRANSFORM (Technical Memorandum). Retrieved from http://www.dtic.mil/dtic/tr/fulltext/u2/a212493.pdf
 
 Background on measuring stress through HRV:
-	Thayer, J. F., Åhs, F., Fredrikson, M., Sollers III, J. J., & Wager, T. D. (2012). A meta-analysis of heart rate variability and neuroimaging studies: Implications for heart rate variability as a marker of stress and health. Neuroscience & Biobehavioral Reviews, 36(2), 747-756. doi:10.1016/j.neubiorev.2011.11.009
+
+>Thayer, J. F., Åhs, F., Fredrikson, M., Sollers III, J. J., & Wager, T. D. (2012). A meta-analysis of heart rate variability and neuroimaging studies: Implications for heart rate variability as a marker of stress and health. Neuroscience & Biobehavioral Reviews, 36(2), 747-756. doi:10.1016/j.neubiorev.2011.11.009
 
 This edited and extended version of code was written by Gerke van Garderen, https://gerkevangarderen.nl/.
 It is written as an extension of existing heart rate sensor code, to add stress sensing through monitoring of Heart Rate Variability (HRV).
