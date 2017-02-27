@@ -1,4 +1,4 @@
-# Sensing Stress with Arduino
+# Measuring Stress with Arduino
 _Using a Heart Beat Sensor to measure stress levels in the human body_
 
 This project is designed to measure heartbeat with an Arduino with heart beat sensor module.
