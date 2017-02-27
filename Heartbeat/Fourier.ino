@@ -19,10 +19,10 @@ void Fourier(){
     }
     
     noInterrupts();
-    fht_window(); // window the data for better frequency response
-    fht_reorder(); // reorder the data before doing the fht
-    fht_run(); // process the data in the fht
-    fht_mag_log(); // take the output of the fht
+    fht_window(); 	// window the data for better frequency response
+    fht_reorder(); 	// reorder the data before doing the fht
+    fht_run(); 		// process the data in the fht
+    fht_mag_log(); 	// get the output of the fht
     interrupts();
       
     for (int a = 2; a < 5; a++){
