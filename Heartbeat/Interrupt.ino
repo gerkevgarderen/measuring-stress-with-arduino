@@ -30,25 +30,51 @@ ISR(TIMER2_COMPA_vect){                         // triggered when Timer2 counts 
   sampleCounter += 2;                         // keep track of the time in mS with this variable
   int N = sampleCounter - lastBeatTime;       // monitor the time since the last beat to avoid noise
  
+  // Subtract the two millisecond interval from the output time
   vibeTimer = max(0,vibeTimer-2);
+  
+  // Optionally some debugging prints
   // Serial.println(vibeTimer);
   // Serial.println(vibeTimeSet);
   // Serial.println(vibeTime1);
 
+  /* Here is where we provide the feedback of the measured stress;
+   *  with a vibration motor in this case.
+   * 
+   * The code works as follows:
+   *   1. Turn on vibration motor for 200millis
+   *   2. Turn off vibration motor for the duration of vibeTimeSet - based on the LF/HF ratio calculated in Fourier.ino
+   *   3. Repeat
+   */
+
+  // If motor is on and timer has reached 0:
   if (vibing && vibeTimer == 0){
+
+    // Set output to 0
+    analogWrite(vibrationPin,0);
+
+    // Update status
     vibing = false;
     silence = true;
-    analogWrite(vibrationPin,0);
-    vibeTimer = vibeTimeSet;
-  } else if (silence && vibeTimer == 0){
-    silence = false;
     
+    // Set new timer with duration vibeTimeSet
+    // The motor will stay off for this duration
+    vibeTimer = vibeTimeSet;
+
+  } else if (silence && vibeTimer == 0){
+    // Stop the silence in next cycle
+    silence = false;
   } else if (!silence && !vibing ){
     vibing = true;
+    // Set new timer
     vibeTimer = 200;
+
+    // Turn vibration feedback motor on
     analogWrite(vibrationPin,150);
-  } 
-  
+  }
+
+  // === End of vibration feedback // Start of heart rate sensor measurements ===
+
   // Find the peak and trough of the pulse wave
   if(Signal < thresh && N > (IBI/5)*3){       // avoid dichrotic noise by waiting 3/5 of last IBI
     if (Signal < T){                        // T is the trough
