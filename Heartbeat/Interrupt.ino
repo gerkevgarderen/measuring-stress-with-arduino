@@ -1,6 +1,6 @@
 // Interrupt code (mostly originating from Pulse Sensor Amped 1.4, small edits by Gerke)
 
-volatile int rate[10];                      // array to hold last ten IBI values
+// Only used to calculate BPM: volatile int rate[10];                      // array to hold last ten IBI values
 volatile unsigned long sampleCounter = 0;   // used to determine pulse timing
 volatile unsigned long lastBeatTime = 0;    // used to find IBI
 volatile int P = 512;                       // used to find peak in pulse wave, seeded
@@ -30,26 +30,52 @@ ISR(TIMER2_COMPA_vect){                         // triggered when Timer2 counts 
   sampleCounter += 2;                         // keep track of the time in mS with this variable
   int N = sampleCounter - lastBeatTime;       // monitor the time since the last beat to avoid noise
  
+  // Subtract the two millisecond interval from the output time
   vibeTimer = max(0,vibeTimer-2);
-  //Serial.println(vibeTimer);
-  //Serial.println(vibeTimeSet);
- // Serial.println(vibeTime1);
   
+  // Optionally some debugging prints
+  // Serial.println(vibeTimer);
+  // Serial.println(vibeTimeSet);
+  // Serial.println(vibeTime1);
+
+  /* Here is where we provide the feedback of the measured stress;
+   *  with a vibration motor in this case.
+   * 
+   * The code works as follows:
+   *   1. Turn on vibration motor for 200millis
+   *   2. Turn off vibration motor for the duration of vibeTimeSet - based on the LF/HF ratio calculated in Fourier.ino
+   *   3. Repeat
+   */
+
+  // If motor is on and timer has reached 0:
   if (vibing && vibeTimer == 0){
+
+    // Set output to 0
+    analogWrite(vibrationPin,0);
+
+    // Update status
     vibing = false;
     silence = true;
-    analogWrite(vibrationPin,0);
-    vibeTimer = vibeTimeSet;
-  } else if (silence && vibeTimer == 0){
-    silence = false;
     
+    // Set new timer with duration vibeTimeSet
+    // The motor will stay off for this duration
+    vibeTimer = vibeTimeSet;
+
+  } else if (silence && vibeTimer == 0){
+    // Stop the silence in next cycle
+    silence = false;
   } else if (!silence && !vibing ){
     vibing = true;
+    // Set new timer
     vibeTimer = 200;
+
+    // Turn vibration feedback motor on
     analogWrite(vibrationPin,150);
-  } 
-  
-    //  find the peak and trough of the pulse wave
+  }
+
+  // === End of vibration feedback // Start of heart rate sensor measurements ===
+
+  // Find the peak and trough of the pulse wave
   if(Signal < thresh && N > (IBI/5)*3){       // avoid dichrotic noise by waiting 3/5 of last IBI
     if (Signal < T){                        // T is the trough
       T = Signal;                         // keep track of lowest point in pulse wave 
@@ -69,12 +95,14 @@ ISR(TIMER2_COMPA_vect){                         // triggered when Timer2 counts 
       IBI = sampleCounter - lastBeatTime;         // measure time between beats in mS
       lastBeatTime = sampleCounter;               // keep track of time for next pulse
 
-      if(secondBeat){                        // if this is the second beat, if secondBeat == TRUE
-        secondBeat = false;                  // clear secondBeat flag
-        for(int i=0; i<=9; i++){             // seed the running total to get a realisitic BPM at startup
-          rate[i] = IBI;                      
-        }
-      }
+      /* Code used for BPM, we only need IBI
+       * if(secondBeat){                        // if this is the second beat, if secondBeat == TRUE
+       *   secondBeat = false;                  // clear secondBeat flag
+       *   for(int i=0; i<=9; i++){             // seed the running total to get a realisitic BPM at startup
+       *     rate[i] = IBI;                      
+       *   }
+       * }
+       */
 
       if(firstBeat){                         // if it's the first time we found a beat, if firstBeat == TRUE
         firstBeat = false;                   // clear firstBeat flag
@@ -83,19 +111,22 @@ ISR(TIMER2_COMPA_vect){                         // triggered when Timer2 counts 
         return;                              // IBI value is unreliable so discard it
       }   
 
-
-      // keep a running total of the last 10 IBI values
-      word runningTotal = 0;                  // clear the runningTotal variable    
-
-      for(int i=0; i<=8; i++){                // shift data in the rate array
-        rate[i] = rate[i+1];                  // and drop the oldest IBI value 
-        runningTotal += rate[i];              // add up the 9 oldest IBI values
-      }
-
-      rate[9] = IBI;                          // add the latest IBI to the rate array
-      runningTotal += rate[9];                // add the latest IBI to runningTotal
-      runningTotal /= 10;                     // average the last 10 IBI values 
-      BPM = 60000/runningTotal;               // how many beats can fit into a minute? that's BPM!
+      /* Code used for BPM, we only need IBI 
+       * // keep a running total of the last 10 IBI values
+       * word runningTotal = 0;                  // clear the runningTotal variable    
+       *
+       * for(int i=0; i<=8; i++){                // shift data in the rate array
+       *   rate[i] = rate[i+1];                  // and drop the oldest IBI value 
+       *   runningTotal += rate[i];              // add up the 9 oldest IBI values
+       * }
+       *
+       *
+       * rate[9] = IBI;                          // add the latest IBI to the rate array
+       * runningTotal += rate[9];                // add the latest IBI to runningTotal
+       * runningTotal /= 10;                     // average the last 10 IBI values 
+       * BPM = 60000/runningTotal;               // how many beats can fit into a minute? that's BPM!
+       */
+ 
       QS = true;                              // set Quantified Self flag 
       // QS FLAG IS NOT CLEARED INSIDE THIS ISR
     }                       
