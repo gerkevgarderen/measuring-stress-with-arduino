@@ -11,8 +11,8 @@ void Fourier(){
  // If enough data is gathered, continue with calculation
   else{
 
-    // Shift all previous readings backwards
-    // Effectively making the array act like a stack
+    // Shift all previous readings to the left
+    // Effectively making the array act like a reverse stack
     for (int i = 0 ; i < FHT_N-1 ; i++) {
       data[i] = data[i+1];
     }
